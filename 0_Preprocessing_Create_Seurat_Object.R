@@ -1,27 +1,6 @@
 #!/usr/bin/env Rscript
-# Retrieve system arguments
-args = commandArgs(trailingOnly=TRUE)
-# test if there 4 arguments: if fewer, return an error
-if (length(args) < 4) {
-  stop("Please provide absolute full path for working directory, sample name, stage name, cellrangerarc output directory.n", call.=FALSE)
-} else if (length(args) > 4) {
-  # return an error when there are more 4 errors
-  stop("Please remove unused arguments.", call.=FALSE)
-}
 
-working_path <- args[1]  #working_path<-"/scratch/ichen/FinRegene_10xMultiome/Signac_processed"
-sample <- args[2] #sample<-"6dpa1"
-stage<-args[3] #"6dpa"
-cellrangerARC_output_path<-args[4] #"/scratch/ichen/FinRegene_10xMultiome/cellrangerARC_processed/6dpa1/outs"
-
-
-count_mtx_path<-paste(cellrangerARC_output_path,"filtered_feature_bc_matrix.h5",sep="/")
-frag_path <- paste(cellrangerARC_output_path,"atac_fragments.tsv.gz",sep="/")
-metadata.path<-paste(cellrangerARC_output_path,"per_barcode_metrics.csv",sep="/")
-stats_file<-paste(sample,"stats_record.txt",sep="_")
-
-
-# Load packages 
+# Load required libraries
 library(Signac)
 library(Seurat)
 library(GenomeInfoDb)
@@ -31,15 +10,53 @@ library(patchwork)
 library(rtracklayer)
 library(GenomicRanges)
 library(BSgenome.Drerio.UCSC.danRer11)
-#set multicores for mtx count
 library(future)
+
+# Retrieve system arguments
+args = commandArgs(trailingOnly = TRUE)
+
+# Check for correct number of arguments
+if (length(args) != 4) {
+  stop("Please provide exactly four arguments: working directory, sample name, stage name, and CellRanger ARC output directory.\n", call. = FALSE)
+}
+
+# Assign arguments
+working_path <- args[1]
+sample <- args[2]
+stage <- args[3]
+cellrangerARC_output_path <- args[4]
+
+# Check if directories exist and create sample directory if it does not exist
+sample_dir <- file.path(working_path, sample)
+if (!dir.exists(sample_dir)) {
+  dir.create(sample_dir, recursive = TRUE)
+}
+setwd(sample_dir)
+
+# Set up paths for data files
+count_mtx_path <- file.path(cellrangerARC_output_path, "filtered_feature_bc_matrix.h5")
+frag_path <- file.path(cellrangerARC_output_path, "atac_fragments.tsv.gz")
+metadata_path <- file.path(cellrangerARC_output_path, "per_barcode_metrics.csv")
+stats_file <- file.path(sample_dir, paste(sample, "stats_record.txt", sep = "_"))
+
+# Ensure required files exist
+if (!file.exists(count_mtx_path)) {
+  stop("Count matrix file does not exist: ", count_mtx_path, "\n")
+}
+if (!file.exists(frag_path)) {
+  stop("Fragments file does not exist: ", frag_path, "\n")
+}
+if (!file.exists(metadata_path)) {
+  stop("Metadata file does not exist: ", metadata_path, "\n")
+}
+
+# Set multicores for matrix count
 set.seed(1234)
 plan("multicore", workers = 12)
 options(future.globals.maxSize = 120000 * 1024^2)
 
-
-# get gene annotations for danRer11
-annotation<-readRDS("/scratch/ichen/FinRegen_10xMultiome/annotations/Danio_rerio_GRCz11.104_Ensembl_gtf_annotation_onlyChr_wEGFP.rds")
+# Read gene annotations
+annotation <- readRDS("/path/to/annotations/Danio_rerio_GRCz11.104_Ensembl_gtf_annotation_onlyChr_wEGFP.rds")
 seqlevelsStyle(annotation) <- "UCSC"
 genome(annotation) <- "danRer11"
 
@@ -52,7 +69,6 @@ step <-"0"
 counts <- Read10X_h5(count_mtx_path)
 
 # create a Seurat object containing the RNA adata
-
 obj<-CreateSeuratObject(
   counts = counts$`Gene Expression`,
   assay = "RNA",
@@ -243,7 +259,7 @@ dev.off()
 saveRDS(obj_subset,file=paste(step,sample,"subset_seurat_object.rds",sep="_"))
 
 
-################# diet seurat object to RNA and ATAC ASSAY ##############
+################# split seurat object to RNA and ATAC ASSAY ##############
 # RNA assay
 DefaultAssay(obj_subset)<-"RNA"
 obj_rna<-DietSeurat(
@@ -254,7 +270,7 @@ obj_rna<-DietSeurat(
   assays = "RNA"
 )
 
-####### SCT Normalization #########
+## SCT Normalization 
 # Import cell cycle genes and calculate cell cycle scores after normalization
 fishCCgenes <- readLines(con = "/bar/yhou/SingleCell/FinReg10xSCRNAseurat_Rproj/AGGallSamp/cyclingCells/cell_cycle_vignette_files/regev_lab_cell_cycle_genes_asFish.txt")
 s.genes <- fishCCgenes[1:42]
@@ -274,7 +290,7 @@ DefaultAssay(obj_rna)<-"SCT"
 saveRDS(obj_rna,file=paste(step,sample,"subset_seurat_RNA_object.rds",sep="_"))
 
 
-# 
+# ATAC peak assay
 DefaultAssay(obj_subset)<-"ATAC_macs2"
 obj_atac<-DietSeurat(
   object= obj_subset,
