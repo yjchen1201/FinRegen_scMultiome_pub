@@ -1,4 +1,5 @@
-# Fig2A
+## Fig2A
+```r
 library(reshape2)
 library(ggplot2)
 celltype_color <- c("#8B2DB2","#CE6DBD","#9C9EDE","#F28E2BFF", "#59A14FFF","#B6992DFF", "#FF9D9AFF",
@@ -45,9 +46,10 @@ long %>% mutate(CellType = factor(CellType, levels = celltypes)) %>%
   theme(plot.title = element_text(hjust = 0.5),axis.text.x=element_blank(),axis.ticks.x=element_blank())+ facet_grid(cols = vars(Comparison)) +
   theme(axis.text = element_text(face="bold",color="black"),axis.title = element_text(face="bold",color="black"))
 ggsave("DEG_back2back_barplot.pdf",width=10,height=4)
+```
 
-
-# Fig 2B
+## Fig 2B
+```r
 library(reshape2)
 library(dplyr)
 library(ggplot2)
@@ -127,9 +129,10 @@ ht = UpSet(m,
         
 })
 dev.off()
+```
 
-
-# Fig2C
+## Fig2C
+```r
 rna=readRDS("/integrated_dietseurat_rna_only.rds")
 Idents(rna)="celltype_wnn_merge"
 celltypes<-c("Superficial_Epithelial",
@@ -401,13 +404,15 @@ draw(
   )  
 
 dev.off()
+```
 
+## Fig2D
+```markdown
+#### Extract shared gene list, use Metascape for GO term analysis
+```
 
-# Fig2D
-# Extract common gene list, then use metascape for analysis
-
-
-# Fig2E
+## Fig2E
+```r
 # check by stage avg expression scale normalization
 rna.exp =read.csv("0_integrated_wnn_merged_celltype_rna_expression_bycelltype_bystage.csv",row.names=1)
 all.ct.deg =readRDS("all_celltype_all_bystage_DEGs.rds")
@@ -548,7 +553,6 @@ dotplot(go,showCategory=5)+
   
   dev.off()
 
-
   #write.csv(row_reordered.df,file=paste0("major_celltype_intersectedDEGs_log2fc_clustering_heatmap_genes_km",km,".csv"))
   df_long = read.csv(paste0("../",celltype,"_allStage_allDEGs_heatmap_genes_km",km,".csv"),row.names=1)
   require(clusterProfiler)
@@ -591,11 +595,11 @@ simp_ego@compareClusterResult<- simp_ego@compareClusterResult %>%
               title = element_text(size = 8))
   )
   dev.off()
-
 }
+```
 
-
-# Fig 2F, 2G
+## Fig 2F, 2G
+```r
 library(clusterProfiler)
 library(org.Dr.eg.db)
 library(ggplot2)
@@ -619,7 +623,6 @@ pdf(paste0(celltype,"_allstageDEGs_heatmap_genes_km",km,"_moduleGOenrich.pdf"), 
   )
   dev.off()
 
-
 key.word = "extracellular matrix organization" 
 df = data.frame(go@compareClusterResult)
 # temp.df=df[df$Description %like% key.word,] #data.table
@@ -634,7 +637,6 @@ Clustered_DotPlot(
     seurat_object = mes, features = genes.select,k=2,group.by="Stage",
     cluster_ident = F,flip=T)
 dev.off()
-
 
 key.word = "skeletal system development" 
 df = data.frame(go@compareClusterResult)
@@ -651,8 +653,6 @@ Clustered_DotPlot(
     cluster_ident = F,flip=T)
 dev.off()
 
-
-
 key.word = "plasma membrane bounded cell projection morphogenesis" 
 df = data.frame(go@compareClusterResult)
 # temp.df=df[df$Description %like% key.word,] #data.table
@@ -667,3 +667,4 @@ Clustered_DotPlot(
     seurat_object = mes, features = genes.select,k=2,group.by="Stage",
     cluster_ident = F,flip=T)
 dev.off()
+```
