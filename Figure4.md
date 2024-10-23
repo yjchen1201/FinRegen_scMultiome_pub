@@ -205,7 +205,8 @@ dev.off()
 
 ## Figure4C-E
 ```markdown
-#### genome browser plots are generated using WashU Epigenome Browser by adding cell type ATAC and RNA bigwig tracks.
+#### genome browser plots are generated using WashU Epigenome Browser
+```
 ```bash
 ## Example of generating browser bigwig track file ##
 mkdir "$atac_output_dir"
