@@ -1,3 +1,4 @@
+```r
 suppressPackageStartupMessages({
 library(Signac)
 library(Seurat)
@@ -79,9 +80,9 @@ celltype_color_final<-c(
     ) 
 
 names(celltype_color_final)<-celltype_final
-
-
-# Fig 1B
+```
+## Fig1B
+```r
 pdf(paste0("WNN_integrated_wnnUMAP_plot_byCelltype.pdf"),width = 12, height = 9)
 print(DimPlot(obj, cols = celltype_color_final,reduction = "wnn.umap", label = F, label.size = 12, pt.size =0.1, repel = TRUE) + ggtitle("Colored_by_celltype") +
 theme(text = element_text(size = 20),axis.text = element_text(size = 20))+
@@ -95,8 +96,10 @@ print(DimPlot(obj, cols = celltype_color_final,reduction = "wnn.umap", split.by 
 theme(text = element_text(size = 20),axis.text = element_text(size = 20))+
 guides(color = guide_legend(override.aes = list(size = 8))))
 dev.off()
+```
 
-# Fig 1C
+## Fig 1C
+```r
 DefaultAssay(obj)="RNA"
 genes=c(
     "krt1-19d","cldn23a", #superficial epithelial
@@ -121,8 +124,10 @@ genes=c(
 pdf(paste0("Allcelltype_marker_gene_Vlnplot.pdf"),width=12,height=12)
 VlnPlot(obj, fill.by = "ident", cols = celltype_color_final, features = genes, stack = TRUE, flip = TRUE)
 dev.off()
+```
 
-# Fig 1D
+## Fig 1D
+```r
 # ATAC coverage plot in maker gene promoter region
 library(ggplot2)
 library(cowplot)
@@ -167,3 +172,4 @@ p.all.select <- do.call(plot_grid, c(p.select, list(ncol = length(p.select))))
 pdf("Allcelltype_markergene_coveragePlot_1kb.pdf",width=60, height=10)
 p.all.select
 dev.off()
+```
