@@ -1,5 +1,4 @@
 #!/usr/bin/Rscript
-#setwd("/scratch/ichen/IReNA/IReNA-v2/use_Signac_p2g/use_Signac_peaklink_JASPAR_motif/step4_new_TF_target_correlation/")
 # Rscript gene_gene_correlation.r celltype stage
 library(dplyr)
 library(tidyverse)
