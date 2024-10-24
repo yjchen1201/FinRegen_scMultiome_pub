@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # Example: 
 ## module load R/4.0.3
-## Rscript p2g_injury.r -o Epidermal_Mucous_subset_object.rds  --p "Epidermal_Mucous" 
+## Rscript p2g_preinjury_and_regeneration.r -o Epidermal_Mucous_subset_object.rds  --p "Epidermal_Mucous" 
 library("optparse")
 
 # option_list = list(
