@@ -1,4 +1,4 @@
-## Fig1A
+## Fig4A
 ```r
 library(RColorBrewer)
 library(colorRamp2)
